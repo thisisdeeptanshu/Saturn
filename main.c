@@ -3,7 +3,7 @@
 
 int main()
 {
-  user a = createUser();
+  user a = create_user();
   printf("%s", a.name);
   return 0;
 }
