@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_USERNAME_LENGTH 21
 
@@ -43,9 +44,43 @@ user create_user()
   }
   user.name[ending] = '\0';
 
-  // printf("%s", user.name);
+  // Czech if user accepts name
+  printf("this good? %s [y/n]\n", user.name);
+  char c_temp;
+  scanf(" %c", &c_temp);
+  while (getchar() != '\n'); // Prevents scanf from auto-executing
+  if (c_temp != 'y' && c_temp != 'Y')
+  {
+    user.name = "";
+    printf("lol");
+    return user;
+  }
 
-  // if (user.name == "") printf("shit");
+  // Checking if user exists in list of users
+  FILE* p_file = fopen("users.txt", "r");
+  char* line = NULL;
+  size_t len = 0;
+  int taken = 0;
+  while (getline(&line, &len, p_file) != -1)
+  {
+    line[strlen(line) - 1] = '\0';
+    if (strcmp(line, user.name) == 0)
+    {
+      user.name = "";
+      printf("Unfortunately, that name is taken :(\nBetter luck next time");
+      taken = 1;
+      break;
+    }
+  }
+  fclose(p_file);
+  free(line);
+  if (taken) return user;
+
+  // Adding user to list of users
+  p_file = fopen("users.txt", "a");
+  fputs(user.name, p_file);
+  fputs("\n", p_file);
+  fclose(p_file);
 
   // Generate public key
 
