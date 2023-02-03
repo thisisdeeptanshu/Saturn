@@ -9,6 +9,7 @@
 #include <string.h>
 #include "string.h"
 #include "user.h"
+#include "dictionary.h"
 
 #define MAXRCVLEN 500
 #define PORTNUM 2300
