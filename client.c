@@ -39,24 +39,25 @@ int main()
   memcpy(server_name, buffer, sizeof(char) * len);
   printf("%s", server_name);
 
-  printf("Type 'exit' to exit.\n");
+  printf("Send 'exit' to close connection.\n");
 
   while (1)
   {
     // Sending
     printf("Msg: ");
-    scanf("%s", msg);
-    while (getchar() != '\n'); // Prevents scanf from auto-executing
+    fgets(msg, MAXRCVLEN, stdin);
+    msg[strlen(msg) - 1] = '\0';
     send(mysocket, msg, strlen(msg), 0);
     if (strcmp("msg", "exit") == 0) break;
 
     // Receiving
     int len = recv(mysocket, buffer, 500, 0);
     buffer[len] = '\0';
-    printf("%s> %s\n", server_name, buffer);
+    if (strcmp(" ", buffer) != 0)
+      printf("%s> %s\n", server_name, buffer);
   }
 
   free(msg);
   close(mysocket);
-  return EXIT_SUCCESS;
+  return 0;
 }

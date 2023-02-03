@@ -58,7 +58,7 @@ int main()
 
       // Sending
       printf("%s> %s\n", connection_name, buffer);
-      send(consocket, "s", strlen("s"), 0);
+      send(consocket, " ", 1, 0);
     }
 
     close(consocket);
