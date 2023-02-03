@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include "string.h"
 
+#define MAXRCVLEN 500
 #define PORTNUM 2300
 
 int main()
@@ -16,10 +17,13 @@ int main()
   struct sockaddr_in serv; /* socket info about our server */
   int mysocket;            /* socket used to listen or incoming connections */
   socklen_t socksize = sizeof(struct sockaddr_in);
+  char* ip = "127.0.0.1";
+  char* name = "Saturn";
+  char buffer[MAXRCVLEN + 1];
 
   memset(&serv, 0, sizeof(serv));           /* zero the struct before filling the fields */
   serv.sin_family = AF_INET;                /* set the type of connection to TCP/IP */
-  serv.sin_addr.s_addr = inet_addr("127.0.0.1"); /* set our address to any interface */
+  serv.sin_addr.s_addr = inet_addr(ip); /* set our address to any interface */
   serv.sin_port = htons(PORTNUM);           /* set the server port number */
 
   mysocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -33,14 +37,19 @@ int main()
 
   while (consocket)
   {
-    printf("Incoming connection from %s - sending message\n", inet_ntoa(dest.sin_addr));
-    char *msg = "Connected to %servername% - %ip-address%";
-    send(consocket, , strlen(msg), 0);
+    char* connection_name = inet_ntoa(dest.sin_addr);
 
-    char buffer[500 + 1];
+    printf("Incoming connection from %s\n", connection_name);
+    char* msg = concat("Connected to ", name);
+    msg = concat(msg, " - ");
+    msg = concat(msg, ip);
+    send(consocket, msg, strlen(msg), 0);
+    recv(consocket, buffer, 500, 0);
+    send(consocket, name, strlen(name), 0);
+
     int len = recv(consocket, buffer, 500, 0);
     buffer[len] = '\0';
-    printf("Received %s (%d bytes).\n", buffer, len);
+    printf("%s> %s\n", connection_name, buffer);
 
     close(consocket);
     consocket = accept(mysocket, (struct sockaddr *)&dest, &socksize);
