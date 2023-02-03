@@ -79,7 +79,8 @@ int main()
           token = strtok(NULL, " ");
           count++;
         }
-        printf("%s - this: %s", args[1], check_username(args[1]));
+        args[1] = check_username(args[1]);
+        msg = concat("This good? [y/n]: ", args[1]);
       }
       else if (strstr(buffer, "signup") != NULL)
       {
