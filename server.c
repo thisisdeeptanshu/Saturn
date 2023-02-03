@@ -6,10 +6,12 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <string.h>
 #include "string.h"
 
 #define MAXRCVLEN 500
 #define PORTNUM 2300
+#define MAX 2300
 
 int main()
 {
@@ -47,9 +49,17 @@ int main()
     recv(consocket, buffer, 500, 0);
     send(consocket, name, strlen(name), 0);
 
-    int len = recv(consocket, buffer, 500, 0);
-    buffer[len] = '\0';
-    printf("%s> %s\n", connection_name, buffer);
+    while (1)
+    {
+      // Receiving
+      int len = recv(consocket, buffer, 500, 0);
+      buffer[len] = '\0';
+      if (strcmp(buffer, "exit") == 0) break;
+
+      // Sending
+      printf("%s> %s\n", connection_name, buffer);
+      send(consocket, "s", strlen("s"), 0);
+    }
 
     close(consocket);
     consocket = accept(mysocket, (struct sockaddr *)&dest, &socksize);

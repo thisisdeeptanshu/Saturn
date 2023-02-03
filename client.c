@@ -14,6 +14,7 @@ int main()
 {
   char buffer[MAXRCVLEN + 1]; /* +1 so we can add null terminator */
   char* server_name;
+  char* msg = malloc(sizeof(char) * MAXRCVLEN);
   int len, mysocket;
   struct sockaddr_in dest;
 
@@ -28,16 +29,34 @@ int main()
 
   len = recv(mysocket, buffer, MAXRCVLEN, 0);
   buffer[len] = '\0';
-  printf("Received %s\n", buffer);
+  printf("%s\n", buffer);
 
   send(mysocket, " ", strlen(" "), 0);
 
   len = recv(mysocket, buffer, MAXRCVLEN, 0);
   buffer[len] = '\0';
-  server_name = buffer;
+  server_name = malloc(sizeof(char) * len);
+  memcpy(server_name, buffer, sizeof(char) * len);
+  printf("%s", server_name);
 
-  send(mysocket, "why helo there", strlen("why helo there"), 0);
+  printf("Type 'exit' to exit.\n");
 
+  while (1)
+  {
+    // Sending
+    printf("Msg: ");
+    scanf("%s", msg);
+    while (getchar() != '\n'); // Prevents scanf from auto-executing
+    send(mysocket, msg, strlen(msg), 0);
+    if (strcmp("msg", "exit") == 0) break;
+
+    // Receiving
+    int len = recv(mysocket, buffer, 500, 0);
+    buffer[len] = '\0';
+    printf("%s> %s\n", server_name, buffer);
+  }
+
+  free(msg);
   close(mysocket);
   return EXIT_SUCCESS;
 }
