@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include "static.h"
 
 #define MAXRCVLEN 500
 #define PORTNUM 2300
@@ -40,6 +41,7 @@ int main()
   printf("%s", server_name);
 
   printf("Send 'exit' to close connection.\n");
+  printf("Send 'help' for a list of commands.\n");
 
   while (1)
   {
@@ -48,7 +50,15 @@ int main()
     fgets(msg, MAXRCVLEN, stdin);
     msg[strlen(msg) - 1] = '\0';
     send(mysocket, msg, strlen(msg), 0);
-    if (strcmp("msg", "exit") == 0) break;
+    if (strcmp(msg, "exit") == 0) break;
+    else if (strcmp(msg, "help") == 0)
+    {
+      printf("login <username> <password>\n");
+      printf("signup <username> <password>\n");
+      printf("username can only contain lowercase-letters, numbers and underscores, max length = %d\n", MAX_USERNAME_LENGTH);
+      printf("exit\n\n");
+      printf("ONLY TYPE IN LOWERCASE\n");
+    }
 
     // Receiving
     int len = recv(mysocket, buffer, 500, 0);

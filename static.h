@@ -1,0 +1,1 @@
+#define MAX_USERNAME_LENGTH 21

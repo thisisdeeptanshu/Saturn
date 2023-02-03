@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-
-#define MAX_USERNAME_LENGTH 21
+#include "static.h"
 
 typedef struct {
   char* name;
+  char* password;
   char* publicKey;
   char* privateKey;
 } user;
@@ -19,14 +19,33 @@ int in_combination(char to_check)
   return 0;
 }
 
-user create_user()
+char* check_username(char* temp)
+{
+  char* name = (char*) malloc(0);
+  int ending = MAX_USERNAME_LENGTH;
+  for (int i = 0; i < MAX_USERNAME_LENGTH - 1; i++)
+  {
+    if (in_combination(temp[i]))
+    {
+      name = (char*) realloc(name, sizeof(char) * (i + 1));
+      name[i] = temp[i];
+    }
+    else
+    {
+      ending = i;
+      break;
+    }
+  }
+  name[ending] = '\0';
+  return name;
+}
+
+user create_user(char* temp, char* password)
 {
   user user;
-  char temp[MAX_USERNAME_LENGTH - 1];
 
   // Getting the username
-  printf("enter username (can only contain lowercase-letters, numbers and underscores, max length = %d)\n", MAX_USERNAME_LENGTH - 1);
-  scanf("%s", temp);
+  // printf("enter username (can only contain lowercase-letters, numbers and underscores, max length = %d)\n", MAX_USERNAME_LENGTH - 1);
   user.name = (char*) malloc(0);
   int ending = MAX_USERNAME_LENGTH;
   for (int i = 0; i < MAX_USERNAME_LENGTH - 1; i++)
@@ -86,5 +105,6 @@ user create_user()
 
   // Generate private key
 
+  user.password = password;
   return user;
 }

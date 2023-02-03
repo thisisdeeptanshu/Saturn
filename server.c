@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <string.h>
 #include "string.h"
+#include "user.h"
 
 #define MAXRCVLEN 500
 #define PORTNUM 2300
@@ -42,25 +43,54 @@ int main()
     char* connection_name = inet_ntoa(dest.sin_addr);
 
     printf("Incoming connection from %s\n", connection_name);
-    char* msg = concat("Connected to ", name);
-    msg = concat(msg, " - ");
-    msg = concat(msg, ip);
-    send(consocket, msg, strlen(msg), 0);
+    char* temp = concat("Connected to ", name);
+    temp = concat(temp, " - ");
+    temp = concat(temp, ip);
+    send(consocket, temp, strlen(temp), 0);
     recv(consocket, buffer, 500, 0);
     send(consocket, name, strlen(name), 0);
+    free(temp);
 
     while (1)
     {
+      char* msg;
+
       // Receiving
       int len = recv(consocket, buffer, 500, 0);
       buffer[len] = '\0';
+
+      printf("%s> %s\n", connection_name, buffer);
+
+      // Evaluating
       if (strcmp(buffer, "exit") == 0) break;
+      else if (strcmp(buffer, "hi") == 0 || strcmp(buffer, "hello") == 0)
+      {
+        msg = "why hello there!";
+      }
+      else if (strstr(buffer, "login") != NULL)
+      {
+        char** args = malloc(0);
+        int count = 0;
+        char* token = strtok(buffer, " ");
+        while (token)
+        {
+          args = realloc(args, sizeof(char[20]) * (count + 1));
+          args[count] = token;
+          token = strtok(NULL, " ");
+          count++;
+        }
+        printf("%s - this: %s", args[1], check_username(args[1]));
+      }
+      else if (strstr(buffer, "signup") != NULL)
+      {
+      }
+      else msg = " ";
 
       // Sending
-      printf("%s> %s\n", connection_name, buffer);
-      send(consocket, " ", 1, 0);
+      send(consocket, msg, strlen(msg), 0);
     }
 
+    // free(msg);
     close(consocket);
     consocket = accept(mysocket, (struct sockaddr *)&dest, &socksize);
   }
