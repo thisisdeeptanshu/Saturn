@@ -10,25 +10,26 @@
 #include "string.h"
 #include "user.h"
 #include "dictionary.h"
-
-#define MAXRCVLEN 500
-#define PORTNUM 2300
-#define MAX 2300
+#include "static.h"
 
 int main()
 {
-  struct sockaddr_in dest; /* socket info about the machine connecting to us*/
-  struct sockaddr_in serv; /* socket info about our server */
-  int mysocket;            /* socket used to listen or incoming connections */
+  struct sockaddr_in dest;
+  struct sockaddr_in serv;
+  int mysocket;
   socklen_t socksize = sizeof(struct sockaddr_in);
   char* ip = "127.0.0.1";
   char* name = "Saturn";
   char buffer[MAXRCVLEN + 1];
+  dictionary d_temp;
+  int stage;
 
-  memset(&serv, 0, sizeof(serv));           /* zero the struct before filling the fields */
-  serv.sin_family = AF_INET;                /* set the type of connection to TCP/IP */
-  serv.sin_addr.s_addr = inet_addr(ip); /* set our address to any interface */
-  serv.sin_port = htons(PORTNUM);           /* set the server port number */
+  d_init(&d_temp);
+
+  memset(&serv, 0, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_addr.s_addr = inet_addr(ip);
+  serv.sin_port = htons(PORTNUM);
 
   mysocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -81,10 +82,19 @@ int main()
           count++;
         }
         args[1] = check_username(args[1]);
+        d_add(&d_temp, "username", args[1]);
+        d_add(&d_temp, "password", args[2]);
         msg = concat("This good? [y/n]: ", args[1]);
       }
       else if (strstr(buffer, "signup") != NULL)
       {
+      }
+      else if (strstr(buffer, "y") != NULL)
+      {
+        if (stage == LOGIN)
+        {
+          msg = "lesgo";
+        }
       }
       else msg = " ";
 
@@ -93,6 +103,7 @@ int main()
     }
 
     // free(msg);
+    d_uninit(&d_temp);
     close(consocket);
     consocket = accept(mysocket, (struct sockaddr *)&dest, &socksize);
   }

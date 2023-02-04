@@ -8,9 +8,6 @@
 #include <sys/socket.h>
 #include "static.h"
 
-#define MAXRCVLEN 500
-#define PORTNUM 2300
-
 int main()
 {
   char buffer[MAXRCVLEN + 1]; /* +1 so we can add null terminator */
